@@ -83,8 +83,8 @@ public class MnistReader {
 	}
 
 	/*******
-	 * Just very ugly utilities below here. Best not to subject yourself to
-	 * them. ;-)
+	 * Just very ugly utilities below here. Best not to subject yourself to them.
+	 * ;-)
 	 ******/
 
 	public static ByteBuffer loadFileToByteBuffer(String infile) {

@@ -39,7 +39,7 @@ public class DoubleComparison {
 
 	/** Inclusive of min and max **/
 	public static boolean inRange(double value, double min, double max) {
-	
-	return (isLargerEquals(value, min) && isSmallerEquals(value, max));
+
+		return (isLargerEquals(value, min) && isSmallerEquals(value, max));
 	}
 }
