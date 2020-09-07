@@ -3,19 +3,21 @@ package neuralNetwork;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import neurons.AbstractNeuron;
+import util.MnistDataLoader;
 import util.MutableDouble;
 
 public class Trainer {
 
 	String imagePath;
 	String labelPath;
-
+	
 	public Trainer() {
 		imagePath = System.getProperty("user.dir") + "\\data\\train-images-idx3-ubyte\\train-images.idx3-ubyte";
-		labelPath = System.getProperty("user.dir") + "\\data\\train-labels-idx1-ubyte\\train-labels.idx1-ubyte";
+		labelPath = System.getProperty("user.dir") + "\\data\\train-labels-idx1-ubyte\\train-labels.idx1-ubyte";		
 	}
 
 	public String getImagePath() {
@@ -26,23 +28,29 @@ public class Trainer {
 		return labelPath;
 	}
 
+	
+	public double getLearningRate() {
+		return 0.03;
+	}
+	
 	/*
 	 * MnistDataLoader should have already loaded the data using load() save the
 	 * network to file after training
 	 * 
 	 */
-	public void backPropagationTrain(NeuralNetwork network, MnistDataLoader dl, boolean saveToFile, String filePath)
+	public void backPropagationTrain1(NeuralNetwork network, MnistDataLoader dl, boolean saveToFile, String filePath)
 			throws IOException {
 		double startTime = System.currentTimeMillis();
 
-		double learningRate = 0.03;
-
-		int sampleSize = dl.getNumberOfLabels();
+		double learningRate = getLearningRate();
+		Random random = new Random(System.currentTimeMillis());
+		int sampleSize = 10000;
 		for (int i = 0; i < sampleSize; i++) {
 
-			// Get the example
-			int xLabel = dl.getLabel(i);
-			double xImage[] = dl.getDoubleImage(i);
+			// Get the example randomly
+			int randomEx = random.nextInt(dl.getSize());
+			int xLabel = dl.getLabel(randomEx);
+			double xImage[] = dl.getDoubleImage(randomEx);
 
 			// Get the output i.e fire the network for the label
 			double[] output = network.fire(xImage);
@@ -82,8 +90,8 @@ public class Trainer {
 					IntStream.range(0, error.il.getSize()).forEach((k) -> {
 						n.setWeight(k,
 								n.getWeight(k) - learningRate * error.il.getNeuron(k).getOutput() * error.error_ol[j]);
-						n.setBias(n.getBias() - learningRate * error.error_ol[j]);
 					});
+					n.setBias(n.getBias() - learningRate * error.error_ol[j]);
 				});
 				
 				error.error_ol = error.error_il;
@@ -99,8 +107,8 @@ public class Trainer {
 				IntStream.range(0, network.getInputSize()).forEach((k) -> {
 					n.setWeight(k, n.getWeight(k) - learningRate * xImage[k] * error.error_ol[j]);
 				//	System.out.println(n.getWeight(k)+" , "+xImage[k]+" , " + error.error_ol[j]);
-				n.setBias(n.getBias() - learningRate * error.error_ol[j]);
 				});
+				n.setBias(n.getBias() - learningRate * error.error_ol[j]);
 			});
 			// System.out.println();
 
@@ -115,4 +123,6 @@ public class Trainer {
 			network.writeToFile(new File(filePath).toPath());
 		}
 	}
+
+
 }

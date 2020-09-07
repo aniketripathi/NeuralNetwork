@@ -49,7 +49,7 @@ public class NeuralLayer<T extends AbstractNeuron> {
 
 			});
 		}
-		 //Arrays.stream(output).forEach(x->System.out.print(x+","));System.out.println();
+		// Arrays.stream(output).forEach(x->System.out.print(x+","));System.out.println();
 		return output;
 	}
 

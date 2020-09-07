@@ -89,11 +89,21 @@ public abstract class AbstractNeuron {
 	 */
 	public double fire(final double inputs[]) {
 
+		return fire(inputs, 0, weights.size());
+	}
+	
+	
+	
+	/*
+	 * Use carefully
+	 */
+	public double fire(final double inputs[], int start, int end) {
+
 		MutableDouble res;
-		if (inputs.length < weights.size()) {
+		if (inputs.length < (end - start)) {
 			throw new IllegalArgumentException("Less number of inputs.");
 		} else {
-			res = IntStream.range(0, weights.size()).parallel().collect(
+			res = IntStream.range(start, end).parallel().collect(
 
 					MutableDouble::new, (result, i) -> {
 						result.add(weights.get(i) * inputs[i]);

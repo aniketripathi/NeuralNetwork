@@ -1,11 +1,48 @@
 package neuralNetwork;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import util.DoubleComparison;
+import util.MnistDataLoader;
 
 public class Tester {
+	
+	
+	 static class Checker {
+		private double error;
+		private double actualOutput;
+		private double expectedOutput;
+		
+		public Checker(double expectedOutput, double actualOutput, double error){
+			this.expectedOutput = expectedOutput;
+			this.actualOutput = actualOutput;
+			this.error = error;
+		}
+		
+		public boolean isCorrect() {
+			return DoubleComparison.isEqual(this.actualOutput, this.expectedOutput);
+		}
+		
+		public double getExpectedOutput() {
+			return this.expectedOutput;
+		}
+		
+		public double getActualOutput() {
+			return this.actualOutput;
+		}
+		
+		public double getError() {
+			return this.error;
+		}
+		
+		// (Expected output, actual output, error)
+		public String toString() {
+			return ("("+this.expectedOutput+","+this.actualOutput+","+this.error+")");
+					
+		}
+		
+	}
+	
+	
+	
 	private String imagePath;
 	private String labelPath;
 
@@ -21,30 +58,49 @@ public class Tester {
 	public String getLabelPath() {
 		return labelPath;
 	}
+	
+	
+	
+	
+	public Checker[] test(NeuralNetwork network, MnistDataLoader dl) {
 
-	public void test(NeuralNetwork network, MnistDataLoader dl) throws IOException {
-
-		double error = 0;
-		int correct = 0, incorrect = 0;
-
-		int totalSample = dl.getNumberOfLabels();
+		int totalSample = dl.getSize();
+		Checker[] result = new Checker[totalSample];
 		for (int i = 0; i < totalSample; i++) {
 			int label = dl.getLabel(i);
 			double image[] = dl.getDoubleImage(i);
-
 			double output[] = network.fire(image);
-			if (DoubleComparison.isLarger(output[label], 0.9)) {
-				correct++;
-			} else
-				incorrect++;
-			error += (1 - output[label]) * (1 - output[label]);
-			 //Arrays.stream(output).forEach(x->System.out.print(x+", "));System.out.println();
-			// StringBuilder sr = new StringBuilder();
-			// sr.append(" correct= ").append(correct).append(" incorrect=").append(incorrect).append(" Answer= ").append(label).append(" Error= ").append(error);
-			// System.out.println(sr.toString());
-
-		}
-		System.out.println(" Correct = " + correct + "/" + (totalSample));
+			
+			int max = 0;
+			double error = 0;
+			for(int j = 0; j < 10; j++) {
+				if(DoubleComparison.isLarger(output[j], output[max]))
+					max = j;
+				if(j == label) 
+					error += Math.abs(1 - output[j]);
+				
+				else
+					error += Math.abs(output[j]);
+			}
+			error /= 10;
+			result[i] = new Checker(label, max, error);
+				}
+		return result;
 	}
-
+	
+	public static void printTestResult(boolean individualResult, Checker[] results) {
+		
+		double error = 0;
+		int correct = 0;
+			for(Checker i: results) {
+				if(individualResult) {		
+					System.out.println(results);
+				}
+				error += i.getError();
+				correct += (i.isCorrect())?1:0;
+			}
+			error /= results.length;
+			System.out.println("Correct = "+ correct + "/" + results.length + ". Average error = "+error);
+		
+	}
 }

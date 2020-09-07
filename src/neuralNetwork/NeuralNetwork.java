@@ -43,6 +43,7 @@ public class NeuralNetwork {
 		return this;
 	}
 
+	
 	public NeuralLayer<?> getLayer(int i) {
 		return layers.get(i);
 	}
